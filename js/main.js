@@ -1,15 +1,7 @@
 "use strict";
 
-/* =====================================================
-   نظام إدارة النتائج
-   ===================================================== */
 
-/**
- * يتحقق من أن القيمة رقم صحيح النطاق (0 – 100).
- * يرمي خطأ بالعربية إذا كانت القيمة فارغة أو غير رقمية أو خارج النطاق.
- */
 function validatePercent(value, label) {
-  // الفحص على النص أولًا لأن Number("") تساوي 0
   if (value === null || value === undefined || String(value).trim() === "") {
     throw new Error(`${label} مطلوبة، يرجى إدخال قيمة.`);
   }
@@ -38,7 +30,6 @@ class Student {
   #attendance;
 
   constructor(name, grade1, grade2, grade3, attendance) {
-    // الإسناد عبر الـ setters لتمرير كل قيمة على التحقق
     this.name = name;
     this.grade1 = grade1;
     this.grade2 = grade2;
@@ -46,7 +37,6 @@ class Student {
     this.attendance = attendance;
   }
 
-  // --- الاسم ---
   get name() {
     return this.#name;
   }
@@ -58,7 +48,6 @@ class Student {
     this.#name = cleaned;
   }
 
-  // --- الدرجات ---
   get grade1() {
     return this.#grade1;
   }
@@ -80,7 +69,6 @@ class Student {
     this.#grade3 = validatePercent(value, "درجة المادة الثالثة");
   }
 
-  // --- نسبة الحضور ---
   get attendance() {
     return this.#attendance;
   }
@@ -88,7 +76,6 @@ class Student {
     this.#attendance = validatePercent(value, "نسبة الحضور");
   }
 
-  // متوسط الدرجات الثلاث
   get average() {
     return (this.#grade1 + this.#grade2 + this.#grade3) / 3;
   }
@@ -113,7 +100,6 @@ const reportArea = document.getElementById("reportArea");
 
 /* ---------- دوال مساعدة ---------- */
 
-// منع حقن HTML عند عرض أسماء الطلاب
 function escapeHtml(text) {
   return String(text)
     .replace(/&/g, "&amp;")
@@ -181,7 +167,6 @@ function handleAddStudent() {
     clearError();
     clearInputs();
   } catch (error) {
-    // عرض الخطأ داخل الصفحة وليس في الكونسول
     showError(error.message);
   }
 }
@@ -196,33 +181,27 @@ function handleMercyCommittee() {
     return;
   }
 
-  // 1) filter: الطلاب الذين متوسطهم من 40 إلى أقل من 50 (أي حتى 49.99)
   const strugglingStudents = studentsList.filter(
     (student) => student.average >= 40 && student.average < 50
   );
 
-  // لا يوجد متعثرون
   if (strugglingStudents.length === 0) {
     reportArea.classList.add("is-clear");
     reportArea.innerHTML = `<p class="mb-0">لا يوجد طلاب متعثرون (متوسطهم بين 40 و49)، لذلك لا حاجة لتطبيق الرأفة.</p>`;
     return;
   }
 
-  // 2) map: إضافة 5 درجات إلى متوسط كل طالب
   const afterMercy = strugglingStudents.map((student) => ({
     name: student.name,
     before: student.average,
     after: student.average + 5,
   }));
 
-  // 3) reduce: مجموع المتوسطات بعد الرأفة
   const totalAverages = afterMercy.reduce((sum, item) => sum + item.after, 0);
 
-  // التحقق من العدد قبل القسمة لتجنب القسمة على صفر
   const overallAverage =
     afterMercy.length > 0 ? totalAverages / afterMercy.length : 0;
 
-  // 4) تقرير بـ Template Literals
   const studentsItems = afterMercy
     .map(
       (item) =>
@@ -245,7 +224,6 @@ function handleMercyCommittee() {
 addStudentBtn.addEventListener("click", handleAddStudent);
 mercyBtn.addEventListener("click", handleMercyCommittee);
 
-// الضغط على Enter داخل أي حقل يضيف الطالب
 [nameInput, grade1Input, grade2Input, grade3Input, attendanceInput].forEach(
   (input) => {
     input.addEventListener("keydown", (event) => {
